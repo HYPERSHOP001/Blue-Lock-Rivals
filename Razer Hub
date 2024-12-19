@@ -1,0 +1,129 @@
+local f = Instance.new("ScreenGui") 
+f.Name = "StyleGui"
+f.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local function p(t)
+    local c, dragInput, dragStart, startPos
+    t.InputBegan:Connect(function(g)
+        if g.UserInputType == Enum.UserInputType.MouseButton1 or g.UserInputType == Enum.UserInputType.Touch then
+            c = true
+            dragStart = g.Position
+            startPos = t.Position
+            g.Changed:Connect(function()
+                if g.UserInputState == Enum.UserInputState.End then
+                    c = false
+                end
+            end)
+        end
+    end)
+    t.InputChanged:Connect(function(g)
+        if g.UserInputType == Enum.UserInputType.MouseMovement or g.UserInputType == Enum.UserInputType.Touch then
+            dragInput = g
+        end
+    end)
+    game:GetService("UserInputService").InputChanged:Connect(function(g)
+        if g == dragInput and c then
+            local r = g.Position - dragStart
+            t.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + r.X,
+                startPos.Y.Scale, startPos.Y.Offset + r.Y
+            )
+        end
+    end)
+end
+
+-- สร้าง Frame หลัก
+local m = Instance.new("Frame")
+m.Size = UDim2.new(0, 300, 0, 250)
+m.Position = UDim2.new(0.5, -150, 0.5, -125)
+m.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+m.BorderSizePixel = 0
+m.Parent = f
+
+local d = Instance.new("UICorner")
+d.CornerRadius = UDim.new(0, 10)
+d.Parent = m
+
+-- สร้าง Header ของ GUI
+local i = Instance.new("Frame")
+i.Size = UDim2.new(1, 0, 0, 30)
+i.Position = UDim2.new(0, 0, 0, 0)
+i.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+i.BorderSizePixel = 0
+i.Parent = m
+
+local l = Instance.new("UICorner")
+l.CornerRadius = UDim.new(0, 10)
+l.Parent = i
+
+local k = Instance.new("TextLabel")
+k.Size = UDim2.new(1, 0, 1, 0)
+k.Text = "Razer Hub"  -- เปลี่ยนจาก Lightninb0lt เป็น Razer Hub
+k.Font = Enum.Font.GothamBold
+k.TextSize = 18
+k.TextColor3 = Color3.fromRGB(255, 255, 255)
+k.BackgroundTransparency = 1
+k.Parent = i
+
+-- ทำให้ GUI สามารถลากได้
+p(m)
+
+-- ปุ่ม Teleport
+local h = Instance.new("TextButton")
+h.Size = UDim2.new(0, 280, 0, 40)
+h.Position = UDim2.new(0, 10, 0, 80)
+h.Text = "Teleport to Football"
+h.Font = Enum.Font.GothamBold
+h.TextSize = 18
+h.TextColor3 = Color3.fromRGB(255, 255, 255)
+h.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+h.BorderSizePixel = 0
+h.Parent = m
+
+local _ = Instance.new("UICorner")
+_.CornerRadius = UDim.new(0, 10)
+_.Parent = h
+
+local football = workspace:WaitForChild("Football")
+local function teleportToFootball()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and football then
+        local root = character:WaitForChild("HumanoidRootPart")
+        root.CFrame = CFrame.new(football.Position)
+    end
+end
+h.MouseButton1Click:Connect(teleportToFootball)
+
+-- ปุ่ม Hide/Show GUI
+local ao = Instance.new("TextButton")
+ao.Size = UDim2.new(0, 100, 0, 40)
+ao.Position = UDim2.new(0, 10, 0, 200)
+ao.Text = "Hide"
+ao.Font = Enum.Font.GothamBold
+ao.TextSize = 18
+ao.TextColor3 = Color3.fromRGB(255, 255, 255)
+ao.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+ao.BorderSizePixel = 0
+ao.Parent = f
+
+local n = Instance.new("UICorner")
+n.CornerRadius = UDim.new(0, 10)
+n.Parent = ao
+
+p(ao)
+
+local guiVisible = true
+local function toggleGUI()
+    guiVisible = not guiVisible
+    m.Visible = guiVisible
+    ao.Text = guiVisible and "Hide" or "Open"
+    ao.BackgroundColor3 = guiVisible and Color3.fromRGB(150, 50, 50) or Color3.fromRGB(50, 150, 50)
+end
+ao.MouseButton1Click:Connect(toggleGUI)
+
+game:GetService("UserInputService").InputBegan:Connect(function(g, b)
+    if g.UserInputType == Enum.UserInputType.Keyboard and g.KeyCode == Enum.KeyCode.F and not b then
+        toggleGUI()
+    end
+end)
